@@ -1,0 +1,7 @@
+.env
+.idea/
+work_with_table.py
+service_account.json
+main.py
+venv/
+*.sqlite
