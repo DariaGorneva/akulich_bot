@@ -127,3 +127,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+src/.env
+.idea/
+work_with_table.py
+src/service_account.json
+venv/
+.venv/
+*.sqlite
