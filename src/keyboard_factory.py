@@ -17,7 +17,7 @@ def create_inline_kb(purchase: t.Optional[Purchase] = None) -> types.InlineKeybo
 
     if purchase is not None:
         if purchase.category is not None:
-            button1 = types.InlineKeyboardButton(text=purchase.category.name,
+            button1 = types.InlineKeyboardButton(text=purchase.category.value,
                                                  callback_data=Configuration.ADD_CATEGORY_KEY)
         if purchase.price is not None:
             button2 = types.InlineKeyboardButton(text=purchase.price, callback_data=Configuration.ADD_PRICE_KEY)
@@ -35,7 +35,7 @@ def choose_category_kb() -> types.InlineKeyboardMarkup:
     temp_array = []
 
     for category in Category:
-        bbt = types.InlineKeyboardButton(f'{category.name}', callback_data=category.name)
+        bbt = types.InlineKeyboardButton(f'{category.value}', callback_data=category.name)
         temp_array.append(bbt)
 
         if len(temp_array) == 2:

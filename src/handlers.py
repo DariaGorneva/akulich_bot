@@ -53,9 +53,9 @@ def init(bot: telebot.TeleBot, db: Database):
             chat_id=call.message.chat.id,
             message_id=call.message.id,
             reply_markup=None,
-            text=f'Purchase {purchase.name} \nCategory {purchase.category.name}\nPrice {purchase.price} RSD\ndone')
+            text=f'Purchase {purchase.name} \nCategory {purchase.category.value}\nPrice {purchase.price} RSD\ndone')
         sh = gc.open_by_key(Configuration.GOOGLE_TOKEN)
-        sh.sheet1.append_row([purchase.category.name, purchase.price, purchase.name])
+        sh.sheet1.append_row([purchase.category.value, purchase.price, purchase.name])
 
     @bot.message_handler(func=check_user_id)  # ответ бота, если этому юзер ид нельзя писать
     def check_user_permissions(message):
