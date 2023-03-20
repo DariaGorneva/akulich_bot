@@ -127,7 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-src/.env
+.env
 .idea/
 work_with_table.py
 src/service_account.json

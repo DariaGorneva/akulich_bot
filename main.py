@@ -16,6 +16,7 @@ if __name__ == '__main__':
     while True:
         try:
             logging.info("Bot running..")
+            print('Running')
             bot.polling(none_stop=True, interval=2)
             break
         except telebot.apihelper.ApiException as e:

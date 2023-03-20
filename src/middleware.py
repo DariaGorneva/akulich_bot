@@ -1,7 +1,7 @@
 import typing as t
 from telebot.types import Message, CallbackQuery
-from config import Configuration
-from database import Database
+from src.config import Configuration
+from src.database import Database
 from functools import wraps
 
 
