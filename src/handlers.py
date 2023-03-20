@@ -11,8 +11,8 @@ from telebot import types
 def init(bot: telebot.TeleBot, db: Database):
     @bot.message_handler(
         content_types=['text'],
-        func=lambda message: (user := db.get_user(message.chat.id)) is not None
-        and user.step is StepOfPurchase.write_price)
+        func=lambda message: db.get_user(message.chat.id) is not None
+        and db.get_user(message.chat.id).step is StepOfPurchase.write_price)
     @check_purchase_middleware(db)
     def add_price(message: Message, user: UserState, purchase: Purchase):
         purchase.price = message.text
@@ -32,8 +32,8 @@ def init(bot: telebot.TeleBot, db: Database):
 
     @bot.message_handler(
         content_types=['text'],
-        func=lambda message: (user := db.get_user(message.chat.id)) is not
-        None and user.step is StepOfPurchase.write_comment
+        func=lambda message: db.get_user(message.chat.id) is not
+        None and db.get_user(message.chat.id).step is StepOfPurchase.write_comment
     )
     @check_purchase_middleware(db)
     def add_comment(message: Message, user: UserState, purchase: Purchase):
