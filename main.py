@@ -49,12 +49,12 @@ async def response():
 if __name__ == '__main__':
     # Создаем два потока - для сервера и для телеграм-бота
     server_thread = threading.Thread(target=start_server)
-    bot_thread = threading.Thread(target=start_bot)
+    # bot_thread = threading.Thread(target=start_bot)
 
     # Запускаем потоки
     server_thread.start()
-    bot_thread.start()
+    # bot_thread.start()
 
     # Ждем, пока оба потока завершат работу
     server_thread.join()
-    bot_thread.join()
+    # bot_thread.join()
