@@ -171,7 +171,7 @@ class MessageProcessor:
 
             user.purchases[message.id] = Purchase(is_closed=False)  # Добавляем в покупку этот юзер ид
 
-        elif telegram_update.message.text == '\start':
+        elif telegram_update.message.text == '/start':
             start_markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
             button1 = types.KeyboardButton(Configuration.NEW_PURCHASE)
             start_markup.add(button1)
