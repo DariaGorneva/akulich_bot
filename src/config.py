@@ -12,6 +12,7 @@ class Configuration:  # заменяем calldadta кнопок
     TG_TOKEN = os.getenv('TG_TOKEN')
     GOOGLE_TOKEN = os.getenv('GOOGLE_TOKEN')
     SERVICE_ACCOUNT = os.getenv('SERVICE_ACCOUNT')
+    APP_DOMAIN = os.getenv('APP_URL')
 
 
 # подключаемся к гугл-таблицам

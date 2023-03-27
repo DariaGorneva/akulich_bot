@@ -1,44 +1,43 @@
-import threading
 from dotenv import load_dotenv
 from src.database import Database
 load_dotenv()
-from src.handlers import init
+from src.handlers import MessageProcessor
 from src.config import Configuration
-import logging
-import time
-from telebot import telebot, TeleBot
+from telebot import TeleBot
 from fastapi import FastAPI
 import uvicorn
+import requests
+from fastapi.responses import Response
+from src.pydantic_models import TelegramUpdate
 
 
 app = FastAPI(
     title='Bot'
-)     # экземпляр приложения
+)
+bot: TeleBot = TeleBot(Configuration.TG_TOKEN, skip_pending=True)
+db = Database()
+
+
+@app.on_event('startup')
+def on_startup():
+    requests.get(
+        url=f'https://api.telegram.org/bot{Configuration.TG_TOKEN}/setWebhook?url={Configuration.APP_DOMAIN}/update'
+    )
+
+
+@app.post('/update')
+async def telegram_update(request: TelegramUpdate):
+    processor = MessageProcessor(bot, db)
+    try:
+        processor.process(request)
+    except Exception as err:
+        pass
+
+    return Response(status_code=200, content='ok')
 
 
 def start_server():
     uvicorn.run(app, host="0.0.0.0", port=8000)
-
-
-def start_bot():
-    bot: TeleBot = TeleBot(Configuration.TG_TOKEN, skip_pending=True)
-    db = Database()
-    init(bot, db)
-    while True:
-        try:
-            logging.info("Bot running..")
-
-            print('Running')
-            bot.polling(none_stop=True, interval=2)
-            break
-        except telebot.apihelper.ApiException as e:
-            logging.error(e)
-            bot.stop_polling()
-
-            time.sleep(15)
-
-            logging.info("Running again!")
-    return {'ok'}
 
 
 @app.get("/")
@@ -47,14 +46,5 @@ async def response():
 
 
 if __name__ == '__main__':
-    # Создаем два потока - для сервера и для телеграм-бота
-    server_thread = threading.Thread(target=start_server)
-    # bot_thread = threading.Thread(target=start_bot)
+    start_server()
 
-    # Запускаем потоки
-    server_thread.start()
-    # bot_thread.start()
-
-    # Ждем, пока оба потока завершат работу
-    server_thread.join()
-    # bot_thread.join()
