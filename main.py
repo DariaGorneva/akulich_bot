@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 from src.database import Database
 load_dotenv()
-from src.handlers import MessageProcessor
+from src.message_processor import MessageProcessor
 from src.config import Configuration
 from telebot import TeleBot
 from fastapi import FastAPI
