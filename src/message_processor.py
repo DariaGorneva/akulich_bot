@@ -60,10 +60,10 @@ class MessageProcessor:
 
     def process_message(self, telegram_update: MessageUpdate) -> bool:
         if self.check_user_id(telegram_update) is False:
-            self.bot.send_message(telegram_update.message.chat.id, 'Not allowed to talk to strangers')
+            self.bot.send_message(telegram_update.message.chat.id, 'Не могу с вами общаться. Я вас не знаю')
 
         if telegram_update.message.text == f'{Configuration.NEW_PURCHASE}':
-            message = self.bot.send_message(telegram_update.message.chat.id, 'Enter purchase details:', reply_markup=create_inline_kb())
+            message = self.bot.send_message(telegram_update.message.chat.id, 'Введите детали покупки:', reply_markup=create_inline_kb())
             user = self.db.get_user(telegram_update.message.chat.id)
             if user is None:
                 user = self.db.create_user(telegram_update.message.chat.id)
@@ -74,7 +74,7 @@ class MessageProcessor:
             start_markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
             button1 = types.KeyboardButton(Configuration.NEW_PURCHASE)
             start_markup.add(button1)
-            self.bot.send_message(telegram_update.message.chat.id, text="Ready to make a purchase?", reply_markup=start_markup)
+            self.bot.send_message(telegram_update.message.chat.id, text="Готовы внести покупку?", reply_markup=start_markup)
 
         else:
             user, purchase = self.get_user_and_purchase(telegram_update)
@@ -85,7 +85,7 @@ class MessageProcessor:
                 self.add_comment(telegram_update, user, purchase)
 
             else:
-                self.bot.send_message(telegram_update.message.chat.id, 'what is this? I dont understand')
+                self.bot.send_message(telegram_update.message.chat.id, 'Что это? Я не понимаю')
 
         return True
 
@@ -96,7 +96,7 @@ class MessageProcessor:
         self.bot.edit_message_text(
             chat_id=request.message.chat.id,
             message_id=user.current_purchase,
-            text="The comment has been entered. What's next?", reply_markup=create_inline_kb(purchase))
+            text="Комментарий добавлен. Что дальше?", reply_markup=create_inline_kb(purchase))
 
     def add_price(self, request, user: UserState, purchase: Purchase):
         purchase.price = request.message.text
@@ -105,7 +105,7 @@ class MessageProcessor:
         self.bot.edit_message_text(
             chat_id=request.message.chat.id,
             message_id=user.current_purchase,
-            text="The price has been entered. What's next?",
+            text="Цена была добавлена. Что дальше?",
             reply_markup=create_inline_kb(purchase))
 
     def choose_category(self, callback):
@@ -113,7 +113,7 @@ class MessageProcessor:
             chat_id=callback.callback_query.message.chat.id,
             message_id=callback.callback_query.message.message_id,
             reply_markup=choose_category_kb(),
-            text='Choose category:'
+            text='Выберите категорию:'
         )
 
     def add_category(self, callback, _: UserState, purchase: Purchase):
@@ -121,16 +121,16 @@ class MessageProcessor:
         self.bot.edit_message_text(
             chat_id=callback.callback_query.message.chat.id,
             message_id=callback.callback_query.message.message_id,
-            text="The category has been entered. What's next?", reply_markup=create_inline_kb(purchase))
+            text="Категория была добавлена. Что дальше?", reply_markup=create_inline_kb(purchase))
 
     def enter_price(self, callback, user: UserState, _: Purchase):
         user.step = StepOfPurchase.write_price
         user.current_purchase = callback.callback_query.message.message_id
 
-        self.bot.send_message(callback.callback_query.message.chat.id, 'Enter price:')
+        self.bot.send_message(callback.callback_query.message.chat.id, 'Введите цену:')
 
     def enter_comment(self, callback, user: UserState, _):
-        self.bot.send_message(callback.callback_query.message.chat.id, 'Enter comment:')
+        self.bot.send_message(callback.callback_query.message.chat.id, 'Введите комментарий:')
         user.step = StepOfPurchase.write_comment
         user.current_purchase = callback.callback_query.message.message_id
 
@@ -141,6 +141,6 @@ class MessageProcessor:
             chat_id=callback.callback_query.message.chat.id,
             message_id=callback.callback_query.message.message_id,
             reply_markup=None,
-            text=f'Purchase {purchase.name} \nCategory {purchase.category.value}\nPrice {purchase.price} RSD\ndone')
+            text=f'Покупка: {purchase.name} \nКатегория: {purchase.category.value}\nЦена: {purchase.price} RSD\nГотово')
         sh = gc.open_by_key(Configuration.GOOGLE_TOKEN)
         sh.sheet1.append_row([current_date, purchase.category.value, purchase.price, purchase.name])
