@@ -6,7 +6,7 @@ class Configuration:  # заменяем calldadta кнопок
     NEW_PURCHASE = 'Новая покупка'
     ADD_CATEGORY_KEY = 'Добавить категорию'
     ADD_PRICE_KEY = 'Добавить цену'
-    ADD_COMMENT_KEY = 'добавить комментарий'
+    ADD_COMMENT_KEY = 'Добавить комментарий'
     DONE_PURCHASE_KEY = 'Готово'
     USERS = [int(os.getenv('USER_1')), int(os.getenv('USER_2'))]
     TG_TOKEN = os.getenv('TG_TOKEN')

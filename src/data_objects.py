@@ -4,17 +4,17 @@ import typing as t
 
 
 class Category(enum.Enum):  # заранее известны категории покупок
-    cafe = 'кафе'
-    subscriptions = 'подписки'
-    household = 'бытовые расходы'
-    beauty = 'красота'
-    health = 'здоровье'
-    entertainment = 'развлечения'
-    documentation = 'документы'
-    holidays = 'праздники'
-    transport = 'транспорт'
-    rent = 'аренда'
-    food = 'еда необходимая'
+    cafe = 'Кафе'
+    subscriptions = 'Подписки'
+    household = 'Бытовые расходы'
+    beauty = 'Красота'
+    health = 'Здоровье'
+    entertainment = 'Развлечения'
+    documentation = 'Документы'
+    holidays = 'Праздники'
+    transport = 'Транспорт'
+    rent = 'Аренда'
+    food = 'Еда необходимая'
 
 
 @dataclasses.dataclass
