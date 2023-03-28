@@ -1,7 +1,5 @@
-
 import typing as t
-from datetime import datetime
-
+from datetime import date
 from src.config import Configuration, gc
 from src.data_objects import UserState, Category, Purchase, StepOfPurchase
 from src.keyboard_factory import create_inline_kb, choose_category_kb
@@ -138,7 +136,7 @@ class MessageProcessor:
 
     def result(self, callback, _: UserState, purchase: Purchase):
         purchase.is_closed = True
-        current_date = datetime.now().date()
+        current_date = date.today().strftime("%d.%m.%Y")
         self.bot.edit_message_text(
             chat_id=callback.callback_query.message.chat.id,
             message_id=callback.callback_query.message.message_id,
