@@ -143,11 +143,11 @@ class MessageProcessor:
             reply_markup=None,
             text=f'Покупка: {purchase.name} \nКатегория: {purchase.category.value}\nЦена: {purchase.price} RSD\nГотово')
         log_sheet = gc.open_by_key(Configuration.GOOGLE_TOKEN)
-        log_sheet.sheet1.append_row([current_date, purchase.category.value, purchase.price, purchase.name])
+        log_sheet.sheet1.append_row([str(current_date), purchase.category.value, int(purchase.price), purchase.name])
 
         budget_sheet = gc.open_by_key(Configuration.GOOGLE_TOKEN_BUDGET_TABLE)
         worksheet = budget_sheet.sheet1
-        column = worksheet.find(current_date).col
+        column = worksheet.find(str(current_date)).col
         row = worksheet.find(purchase.category.value).row
         cell = worksheet.cell(row, column)  # для получения объекта Cell по координатам
         value = cell.value  # для получения значения ячейки или его изменения
