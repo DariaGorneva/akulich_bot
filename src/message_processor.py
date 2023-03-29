@@ -136,11 +136,26 @@ class MessageProcessor:
 
     def result(self, callback, _: UserState, purchase: Purchase):
         purchase.is_closed = True
-        current_date = date.today().strftime("%d.%m.%Y")
+        current_date = date.today().strftime("%m.%Y")
         self.bot.edit_message_text(
             chat_id=callback.callback_query.message.chat.id,
             message_id=callback.callback_query.message.message_id,
             reply_markup=None,
             text=f'Покупка: {purchase.name} \nКатегория: {purchase.category.value}\nЦена: {purchase.price} RSD\nГотово')
-        sh = gc.open_by_key(Configuration.GOOGLE_TOKEN)
-        sh.sheet1.append_row([current_date, purchase.category.value, purchase.price, purchase.name])
+        log_sheet = gc.open_by_key(Configuration.GOOGLE_TOKEN)
+        log_sheet.sheet1.append_row([current_date, purchase.category.value, purchase.price, purchase.name])
+
+        budget_sheet = gc.open_by_key(Configuration.GOOGLE_TOKEN_BUDGET_TABLE)
+        worksheet = budget_sheet.sheet1
+        column = worksheet.find(current_date).col
+        row = worksheet.find(purchase.category.value).row
+        cell = worksheet.cell(row, column)  # для получения объекта Cell по координатам
+        value = cell.value  # для получения значения ячейки или его изменения
+
+        if value is None:
+            value = 0
+        else:
+            value = int(cell.value)
+
+        value += purchase.price
+        worksheet.update_cell(row, column, value)

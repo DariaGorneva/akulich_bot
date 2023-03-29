@@ -11,6 +11,7 @@ class Configuration:  # заменяем calldadta кнопок
     USERS = [int(os.getenv('USER_1')), int(os.getenv('USER_2'))]
     TG_TOKEN = os.getenv('TG_TOKEN')
     GOOGLE_TOKEN = os.getenv('GOOGLE_TOKEN')
+    GOOGLE_TOKEN_BUDGET_TABLE = os.getenv('GOOGLE_TOKEN_BUDGET_TABLE')
     SERVICE_ACCOUNT = os.getenv('SERVICE_ACCOUNT')
     APP_DOMAIN = os.getenv('APP_URL')
 
