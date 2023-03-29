@@ -4,8 +4,9 @@ import gspread as gspread
 
 class Configuration:  # заменяем calldadta кнопок
     NEW_PURCHASE = 'Новая покупка'
+    INCOME = 'Внести доходы'
     ADD_CATEGORY_KEY = 'Добавить категорию'
-    ADD_PRICE_KEY = 'Добавить цену'
+    ADD_PRICE_KEY = 'Добавить сумму'
     ADD_COMMENT_KEY = 'Добавить комментарий'
     DONE_PURCHASE_KEY = 'Готово'
     USERS = [int(os.getenv('USER_1')), int(os.getenv('USER_2'))]

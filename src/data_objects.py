@@ -15,6 +15,7 @@ class Category(enum.Enum):  # заранее известны категории
     transport = 'Транспорт'
     rent = 'Аренда'
     food = 'Еда необходимая'
+    income = 'Доход'
 
 
 @dataclasses.dataclass

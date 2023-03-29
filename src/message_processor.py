@@ -2,7 +2,7 @@ import typing as t
 from datetime import date
 from src.config import Configuration, gc
 from src.data_objects import UserState, Category, Purchase, StepOfPurchase
-from src.keyboard_factory import create_inline_kb, choose_category_kb
+from src.keyboard_factory import create_inline_kb, choose_category_kb, kb_for_income
 from telebot import types
 from src.pydantic_models import TelegramUpdate, CallbackUpdate, MessageUpdate
 
@@ -62,7 +62,15 @@ class MessageProcessor:
         if self.check_user_id(telegram_update) is False:
             self.bot.send_message(telegram_update.message.chat.id, 'Не могу с вами общаться. Я вас не знаю')
 
-        if telegram_update.message.text == f'{Configuration.NEW_PURCHASE}':
+        if telegram_update.message.text == f'{Configuration.INCOME}':
+            message = self.bot.send_message(telegram_update.message.chat.id, 'Введите поступивший доход:', reply_markup=kb_for_income())
+            user = self.db.get_user(telegram_update.message.chat.id)
+            if user is None:
+                user = self.db.create_user(telegram_update.message.chat.id)
+
+            user.purchases[message.id] = Purchase(category=Category.income, is_closed=False)
+
+        elif telegram_update.message.text == f'{Configuration.NEW_PURCHASE}':
             message = self.bot.send_message(telegram_update.message.chat.id, 'Введите детали покупки:', reply_markup=create_inline_kb())
             user = self.db.get_user(telegram_update.message.chat.id)
             if user is None:
@@ -73,8 +81,9 @@ class MessageProcessor:
         elif telegram_update.message.text == '/start':
             start_markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
             button1 = types.KeyboardButton(Configuration.NEW_PURCHASE)
-            start_markup.add(button1)
-            self.bot.send_message(telegram_update.message.chat.id, text="Готовы внести покупку?", reply_markup=start_markup)
+            button2 = types.KeyboardButton(Configuration.INCOME)
+            start_markup.add(button1, button2)
+            self.bot.send_message(telegram_update.message.chat.id, text="Что мне сделать?", reply_markup=start_markup)
 
         else:
             user, purchase = self.get_user_and_purchase(telegram_update)
@@ -105,7 +114,7 @@ class MessageProcessor:
         self.bot.edit_message_text(
             chat_id=request.message.chat.id,
             message_id=user.current_purchase,
-            text="Цена была добавлена. Что дальше?",
+            text="Сумма была добавлена. Что дальше?",
             reply_markup=create_inline_kb(purchase))
 
     def choose_category(self, callback):
@@ -127,7 +136,7 @@ class MessageProcessor:
         user.step = StepOfPurchase.write_price
         user.current_purchase = callback.callback_query.message.message_id
 
-        self.bot.send_message(callback.callback_query.message.chat.id, 'Введите цену:')
+        self.bot.send_message(callback.callback_query.message.chat.id, 'Введите сумму:')
 
     def enter_comment(self, callback, user: UserState, _):
         self.bot.send_message(callback.callback_query.message.chat.id, 'Введите комментарий:')
@@ -141,7 +150,7 @@ class MessageProcessor:
             chat_id=callback.callback_query.message.chat.id,
             message_id=callback.callback_query.message.message_id,
             reply_markup=None,
-            text=f'Покупка: {purchase.name} \nКатегория: {purchase.category.value}\nЦена: {purchase.price} RSD\nГотово')
+            text=f'Комментарий: {purchase.name} \nКатегория: {purchase.category.value}\nСумма: {purchase.price} RSD\nГотово')
         log_sheet = gc.open_by_key(Configuration.GOOGLE_TOKEN)
         log_sheet.sheet1.append_row([str(current_date), purchase.category.value, str(purchase.price), purchase.name])
 

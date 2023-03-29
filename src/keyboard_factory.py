@@ -4,6 +4,25 @@ from src.config import Configuration
 from src.data_objects import Purchase, Category
 
 
+def kb_for_income(purchase: t.Optional[Purchase] = None) -> types.InlineKeyboardMarkup:
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    button1 = types.InlineKeyboardButton(text=Configuration.ADD_PRICE_KEY, callback_data=Configuration.ADD_PRICE_KEY)
+    button2 = types.InlineKeyboardButton(text=Configuration.ADD_COMMENT_KEY,
+                                         callback_data=Configuration.ADD_COMMENT_KEY)
+    button3 = types.InlineKeyboardButton(text=Configuration.DONE_PURCHASE_KEY,
+                                         callback_data=Configuration.DONE_PURCHASE_KEY)
+
+    if purchase is not None:
+        if purchase.price is not None:
+            button1 = types.InlineKeyboardButton(text=purchase.price, callback_data=Configuration.ADD_PRICE_KEY)
+
+        if purchase.name is not None:
+            button2 = types.InlineKeyboardButton(text=purchase.name, callback_data=Configuration.ADD_COMMENT_KEY)
+
+    markup.add(button1, button2, button3)
+    return markup
+
+
 # Основная клав-ра, с которой будет происходить добавление покупок
 def create_inline_kb(purchase: t.Optional[Purchase] = None) -> types.InlineKeyboardMarkup:
     markup = types.InlineKeyboardMarkup(row_width=1)
