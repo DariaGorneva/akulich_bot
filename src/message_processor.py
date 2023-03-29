@@ -143,7 +143,7 @@ class MessageProcessor:
             reply_markup=None,
             text=f'Покупка: {purchase.name} \nКатегория: {purchase.category.value}\nЦена: {purchase.price} RSD\nГотово')
         log_sheet = gc.open_by_key(Configuration.GOOGLE_TOKEN)
-        log_sheet.sheet1.append_row([str(current_date), purchase.category.value, int(purchase.price), purchase.name])
+        log_sheet.sheet1.append_row([str(current_date), purchase.category.value, str(purchase.price), purchase.name])
 
         budget_sheet = gc.open_by_key(Configuration.GOOGLE_TOKEN_BUDGET_TABLE)
         worksheet = budget_sheet.sheet1
