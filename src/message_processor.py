@@ -157,5 +157,5 @@ class MessageProcessor:
         else:
             value = int(cell.value)
 
-        value += purchase.price
+        value += int(purchase.price)
         worksheet.update_cell(row, column, value)
