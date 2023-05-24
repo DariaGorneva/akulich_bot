@@ -110,7 +110,7 @@ class MessageProcessor:
             text="Комментарий добавлен. Что дальше?", reply_markup=create_inline_kb(purchase))
 
     def add_price(self, request, user: UserState, purchase: Purchase):
-        if request.message.isdigit:
+        if request.message.text.isdigit():
             purchase.price = request.message.text
             user.step = StepOfPurchase.default
 
