@@ -63,7 +63,8 @@ class MessageProcessor:
             self.bot.send_message(telegram_update.message.chat.id, 'Не могу с вами общаться. Я вас не знаю')
 
         if telegram_update.message.text == f'{Configuration.INCOME}':
-            message = self.bot.send_message(telegram_update.message.chat.id, 'Введите поступивший доход:', reply_markup=kb_for_income())
+            message = self.bot.send_message(telegram_update.message.chat.id, 'Введите поступивший доход:',
+                                            reply_markup=kb_for_income())
             user = self.db.get_user(telegram_update.message.chat.id)
             if user is None:
                 user = self.db.create_user(telegram_update.message.chat.id)
@@ -71,7 +72,8 @@ class MessageProcessor:
             user.purchases[message.id] = Purchase(category=Category.income, is_closed=False)
 
         elif telegram_update.message.text == f'{Configuration.NEW_PURCHASE}':
-            message = self.bot.send_message(telegram_update.message.chat.id, 'Введите детали покупки:', reply_markup=create_inline_kb())
+            message = self.bot.send_message(telegram_update.message.chat.id, 'Введите детали покупки:',
+                                            reply_markup=create_inline_kb())
             user = self.db.get_user(telegram_update.message.chat.id)
             if user is None:
                 user = self.db.create_user(telegram_update.message.chat.id)
@@ -108,14 +110,17 @@ class MessageProcessor:
             text="Комментарий добавлен. Что дальше?", reply_markup=create_inline_kb(purchase))
 
     def add_price(self, request, user: UserState, purchase: Purchase):
-        purchase.price = request.message.text
-        user.step = StepOfPurchase.default
+        if request.message.text.isdigit:
+            purchase.price = request.message.text
+            user.step = StepOfPurchase.default
 
-        self.bot.edit_message_text(
-            chat_id=request.message.chat.id,
-            message_id=user.current_purchase,
-            text="Сумма была добавлена. Что дальше?",
-            reply_markup=create_inline_kb(purchase))
+            self.bot.edit_message_text(
+                chat_id=request.message.chat.id,
+                message_id=user.current_purchase,
+                text="Сумма была добавлена. Что дальше?",
+                reply_markup=create_inline_kb(purchase))
+        else:
+            self.bot.send_message(request.message.chat.id, 'Неверный формат ввода цены. Попробуйте снова.')
 
     def choose_category(self, callback):
         self.bot.edit_message_text(
