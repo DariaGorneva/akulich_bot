@@ -24,8 +24,6 @@ class MessageProcessor(Processor):
     __SEND_MESSAGE_URL = f"https://api.telegram.org/bot{Configuration.TG_TOKEN}/sendMessage"
     __UPDATE_MESSAGE_URL = f"https://api.telegram.org/bot{Configuration.TG_TOKEN}/editMessageText"
 
-    # __EDIT_MESSAGE_REPLY_MARKUP = f"https://api.telegram.org/bot{Configuration.TG_TOKEN}/editMessageReplyMarkup"
-
     def __init__(self, db):
         self.db = db
 
@@ -54,6 +52,11 @@ class MessageProcessor(Processor):
                     'Введите детали покупки:',
                     reply_markup=create_inline_kb()
                 )
+
+                purchase = Purchase(is_closed=False)
+                user.purchases[message.result.message_id] = purchase
+                user.current_purchase = message.result.message_id
+
             if callback.callback_query.data == Configuration.ADD_PRICE_KEY:
                 self.__enter_price(callback, user, purchase)
             if callback.callback_query.data == Configuration.ADD_CATEGORY_KEY:
@@ -80,17 +83,12 @@ class MessageProcessor(Processor):
             raise ValueError('Invalid object')
 
         if user is None:
-            if chat_id in Configuration.USERS:
-                user = self.db.create_user(chat_id)
-            else:
-                raise ValueError('user is None')
-
-        if user.current_purchase is None:
-            raise ValueError('No current purchase')
+            raise ValueError('user is None')
 
         purchase = user.purchases.get(user.current_purchase)
         if purchase is None:
             raise ValueError('No purchase with current id')
+
         return user, purchase
 
     def __process_message(self, telegram_update: MessageUpdate) -> bool:
