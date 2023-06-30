@@ -2,17 +2,17 @@ from pydantic import BaseModel
 import typing
 
 
-class InlineKeyboard(BaseModel):
-    text: str
-    callback_data: str
-
-
 class Chat(BaseModel):
     id: int
 
 
 class ReplyMarkup(BaseModel):
+    class InlineKeyboard(BaseModel):
+        text: str
+        callback_data: typing.Optional[str]
+
     inline_keyboard: typing.List[typing.List[InlineKeyboard]]
+
 
 
 class UserMessage(BaseModel):
@@ -36,3 +36,10 @@ class MessageUpdate(BaseModel):
 
 
 TelegramUpdate = typing.Union[MessageUpdate, CallbackUpdate]
+
+
+class SendMessageResponse(BaseModel):
+    class Result(BaseModel):
+        message_id: int
+
+    result: typing.Optional[Result]

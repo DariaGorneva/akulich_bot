@@ -38,3 +38,4 @@ class UserState:    # состояние юзера - его шаг и обща�
     step: StepOfPurchase = StepOfPurchase.default
     purchases: t.Dict[int, Purchase] = dataclasses.field(default_factory=lambda: dict())  # ?
     current_purchase: t.Optional[int] = None  # ?
+
