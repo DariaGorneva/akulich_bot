@@ -1,24 +1,23 @@
 from dotenv import load_dotenv
+
 from src.database import Database
+
 load_dotenv()
 from src.message_processor import MessageProcessor
 from src.config import Configuration
-from telebot import TeleBot
 from fastapi import FastAPI
 import uvicorn
 import requests
 from fastapi.responses import Response
 from src.pydantic_models import TelegramUpdate
 
-
 app = FastAPI(
     title='Bot'
 )
-bot: TeleBot = TeleBot(Configuration.TG_TOKEN, skip_pending=True)
 db = Database()
 
 
-@app.on_event('startup')
+@app.on_event('startup')  # когда поднимаем сайт
 def on_startup():
     requests.get(
         url=f'https://api.telegram.org/bot{Configuration.TG_TOKEN}/setWebhook?url={Configuration.APP_DOMAIN}/update'
@@ -27,11 +26,12 @@ def on_startup():
 
 @app.post('/update')
 async def telegram_update(request: TelegramUpdate):
-    processor = MessageProcessor(bot, db)
+    print(request)
+    processor = MessageProcessor(db)
     try:
         processor.process(request)
     except Exception as err:
-        pass
+        print(err)
 
     return Response(status_code=200, content='ok')
 
@@ -47,4 +47,3 @@ async def response():
 
 if __name__ == '__main__':
     start_server()
-
