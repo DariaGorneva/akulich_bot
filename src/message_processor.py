@@ -5,11 +5,11 @@ from datetime import date
 import requests
 from pydantic import parse_obj_as
 
-from src.config import Configuration
+from src.config import Configuration, gc
 from src.data_objects import UserState, Category, Purchase, StepOfPurchase
-from src.keyboard_factory import create_inline_kb, choose_category_kb, kb_for_income, ReplyMarkup
+from src.keyboard_factory import create_inline_kb, choose_category_kb, kb_for_income
 from src.pydantic_models import TelegramUpdate, CallbackUpdate, MessageUpdate, SendMessageResponse, ReplyKeyboard, \
-    InlineMarkup
+    InlineMarkup, ReplyMarkup
 
 
 class Processor(abc.ABC):
@@ -136,7 +136,6 @@ class MessageProcessor(Processor):
                                  )
 
     def __add_price(self, request, user: UserState, purchase: Purchase):
-        print(f'price {request}')
         if request.message.text.isdigit():
             purchase.price = request.message.text
             user.step = StepOfPurchase.default
@@ -145,8 +144,6 @@ class MessageProcessor(Processor):
                                      text="Сумма была добавлена. Что дальше?",
                                      reply_markup=create_inline_kb(purchase)
                                      )
-            print(user.current_purchase)
-            print(purchase)
         else:
             self.__send_message(request.message.chat.id, 'Неверный формат ввода цены. Попробуйте снова.')
 
@@ -160,7 +157,6 @@ class MessageProcessor(Processor):
 
     def __add_category(self, callback, _: UserState, purchase: Purchase):
         purchase.category = Category[callback.callback_query.data]
-        print(purchase.category)
         self.__edit_message_text(chat_id=callback.callback_query.message.chat.id,
                                  message_id=callback.callback_query.message.message_id,
                                  text="Категория была добавлена. Что дальше?",
@@ -212,11 +208,9 @@ class MessageProcessor(Processor):
     def __enter_comment(self, callback, user: UserState, _: Purchase):
         user.step = StepOfPurchase.write_comment
         user.current_purchase = callback.callback_query.message.message_id
-        print(user.current_purchase)
         self.__send_message(callback.callback_query.message.chat.id, 'Введите комментарий:')
 
     def __result(self, callback, user: UserState, purchase: Purchase):
-        print(f'result {purchase}')
         purchase.is_closed = True
         user.current_purchase = callback.callback_query.message.message_id
         current_date = date.today().strftime("%m.%Y")
@@ -225,21 +219,21 @@ class MessageProcessor(Processor):
                                  reply_markup=None,
                                  text=f'Комментарий: {purchase.name} \nКатегория: {purchase.category.value}\nСумма: {purchase.price} RSD\nГотово'
                                  )
-        # log_sheet = gc.open_by_key(Configuration.GOOGLE_TOKEN)
-        # log_sheet.sheet1.append_row(
-        #     [str(current_date), purchase.category.value, str(purchase.price), purchase.name])
-        #
-        # budget_sheet = gc.open_by_key(Configuration.GOOGLE_TOKEN_BUDGET_TABLE)
-        # worksheet = budget_sheet.sheet1
-        # column = worksheet.find(str(current_date)).col
-        # row = worksheet.find(purchase.category.value).row
-        # cell = worksheet.cell(row, column)  # для получения объекта Cell по координатам
-        # value = cell.value  # для получения значения ячейки или его изменения
-        #
-        # if value is None:
-        #     value = 0
-        # else:
-        #     value = int(cell.value)
-        #
-        # value += int(purchase.price)
-        # worksheet.update_cell(row, column, value)
+        log_sheet = gc.open_by_key(Configuration.GOOGLE_TOKEN)
+        log_sheet.sheet1.append_row(
+            [str(current_date), purchase.category.value, str(purchase.price), purchase.name])
+
+        budget_sheet = gc.open_by_key(Configuration.GOOGLE_TOKEN_BUDGET_TABLE)
+        worksheet = budget_sheet.sheet1
+        column = worksheet.find(str(current_date)).col
+        row = worksheet.find(purchase.category.value).row
+        cell = worksheet.cell(row, column)  # для получения объекта Cell по координатам
+        value = cell.value  # для получения значения ячейки или его изменения
+
+        if value is None:
+            value = 0
+        else:
+            value = int(cell.value)
+
+        value += int(purchase.price)
+        worksheet.update_cell(row, column, value)
