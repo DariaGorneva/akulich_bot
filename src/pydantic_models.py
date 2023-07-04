@@ -19,7 +19,7 @@ class ReplyKeyboard(BaseModel):
 class ReplyMarkup(BaseModel):
     keyboard: t.List[t.List[ReplyKeyboard]]
     one_time_keyboard: t.Optional[bool] = False
-    resize_keyboard: t.Optional[bool] = False
+    resize_keyboard: t.Optional[bool] = True
 
 
 class InlineMarkup(BaseModel):
