@@ -26,7 +26,6 @@ def on_startup():
 
 @app.post('/update')
 async def telegram_update(request: TelegramUpdate):
-    print(request)
     processor = MessageProcessor(db)
     try:
         processor.process(request)
