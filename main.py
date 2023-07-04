@@ -1,5 +1,7 @@
 from dotenv import load_dotenv
+
 from src.database import Database
+
 load_dotenv()
 from src.message_processor import MessageProcessor
 from src.config import Configuration
@@ -9,14 +11,13 @@ import requests
 from fastapi.responses import Response
 from src.pydantic_models import TelegramUpdate
 
-
 app = FastAPI(
     title='Bot'
 )
 db = Database()
 
 
-@app.on_event('startup')    # когда поднимаем сайт
+@app.on_event('startup')  # когда поднимаем сайт
 def on_startup():
     requests.get(
         url=f'https://api.telegram.org/bot{Configuration.TG_TOKEN}/setWebhook?url={Configuration.APP_DOMAIN}/update'
@@ -46,4 +47,3 @@ async def response():
 
 if __name__ == '__main__':
     start_server()
-
